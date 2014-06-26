@@ -111,7 +111,7 @@ function OnDraw()
 		if Menu.Draw.drawR and rReady then
 			DrawCircle(myHero.x, myHero.y, myHero.z, Aatrox.R["range"], ARGB(255, 255, 255, 255))
 		end		
-		if Menu.Draw.predLoc then 
+		if Menu.Draw.predLoc and target ~= nil then 
 			DrawPredPos()
 		end
 		if target ~= nil then
