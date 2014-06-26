@@ -319,10 +319,6 @@ function SpellManager(target, Qs, Ws, Es, Rs, items, uIgnite, escape)
 				if VIP_USER then
 					local castPos, info = Prodiction.GetCircularAOEPrediction(target, Aatrox.Q["range"], Aatrox.Q["speed"], Aatrox.Q["delay"], Aatrox.Q["width"])																
 					if castPos then
-						if Menu.Draw.predLoc and castPos ~= nil and target ~= nil then
-							DrawCircle(castPos.x, castPos.y, castPos.z, 150, ARGB(255, 34, 139, 34))
-							DrawLine3D(castPos.x, castPos.y, castPos.z, target.x, target.y, target.z, 15, ARGB(255, 34, 139, 34))			
-						end
 						if info.hitchance ~= 0 then
 							CastSpell(_Q, castPos.x, castPos.z)
 						end
