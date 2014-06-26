@@ -1,9 +1,9 @@
 --[[
 	Top Lane Series - Aatrox by lel itz ok
-	version 0.003
+	version 0.004
 	20/06/2014
 --]]
-local version = 0.003
+local version = 0.004
 
 local author = "lel itz ok"
 
@@ -55,6 +55,7 @@ local Aatrox = {
 }
 
 local ignite = nil
+local target = nil
 
 --------------------------------------------------------------------------------------------------------------------------------------------
 ---- Callbacks
@@ -92,6 +93,10 @@ function OnDraw()
 	-- Don't draw incase we are dead
 	if myHero.dead then return end	
 	
+	if Menu.Farm.laneclearKey then
+		DrawLastHit()
+	end
+	
 	-- If drawing is enabled, check what to draw.
 	if Menu.Draw.drawAll then
 		if Menu.Draw.drawAA then
@@ -106,7 +111,63 @@ function OnDraw()
 		if Menu.Draw.drawR and rReady then
 			DrawCircle(myHero.x, myHero.y, myHero.z, Aatrox.R["range"], ARGB(255, 255, 255, 255))
 		end		
+		if Menu.Draw.predLoc then 
+			DrawPredPos()
+		end
+		if target ~= nil then
+			DrawCircle(target.x, target.y, target.z, 150, ARGB(255, 34, 139, 34))	
+			DrawDmgCalc()
+		end	
 	end
+end
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+---- Draw functions
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+function DrawLastHit()
+	for i, minion in pairs(enemyMinions.objects) do
+		if minion ~= nil and minion.health < getDmg("AD", minion, myHero) then
+			DrawCircle(minion.x, minion.y, minion.z, 65, ARGB(255, 255, 255, 255))	
+		end
+	end
+end
+
+function DrawPredPos()
+	local castPos, info = Prodiction.GetConeAOEPrediction(target, Aatrox.E["range"], Aatrox.E["speed"], Aatrox.E["delay"], Aatrox.E["width"])																
+	if Menu.Draw.predLoc and castPos ~= nil and target ~= nil then
+		DrawCircle(castPos.x, castPos.y, castPos.z, 150, ARGB(255, 34, 139, 34))
+		DrawLine3D(castPos.x, castPos.y, castPos.z, target.x, target.y, target.z, 5, ARGB(255, 34, 139, 34))			
+	end
+end
+
+function DrawDmgCalc()
+	if GetBurstDamage() > target.health then 
+		local drawPos = WorldToScreen(D3DXVECTOR3(target.x, target.y, target.z))
+		local drawPosX = drawPos.x - 35
+		local drawPosY = drawPos.y - 50
+		DrawText("100% KILL - GO FOR IT!", 15, drawPosX, drawPosY, ARGB(255, 255, 125, 000))
+	end
+end
+
+function GetBurstDamage()	
+	local Q = 0
+	local E = 0
+	local R = 0
+	local burst = 0
+	
+	if qReady then
+		Q = getDmg("Q", target, myHero)
+	end
+	if eReady then
+		E = getDmg("E", target, myHero)
+	end
+	if rReady then
+		R = getDmg("R", target, myHero)
+	end
+	
+	burst = Q + E + R
+	return burst
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------
@@ -255,10 +316,16 @@ function SpellManager(target, Qs, Ws, Es, Rs, items, uIgnite, escape)
 	if Qs then
 		if target and qReady then
 			if ValidTarget(target) then	
-				if VIP_USER then			
-					local castPos, info = Prodiction.GetCircularAOEPrediction(target, Aatrox.Q["range"], Aatrox.Q["speed"], Aatrox.Q["delay"], Aatrox.Q["width"])
-					if castPos and info.hitchance ~= 0 then
-						CastSpell(_Q, castPos.x, castPos.z)
+				if VIP_USER then
+					local castPos, info = Prodiction.GetCircularAOEPrediction(target, Aatrox.Q["range"], Aatrox.Q["speed"], Aatrox.Q["delay"], Aatrox.Q["width"])																
+					if castPos then
+						if Menu.Draw.predLoc and castPos ~= nil and target ~= nil then
+							DrawCircle(castPos.x, castPos.y, castPos.z, 150, ARGB(255, 34, 139, 34))
+							DrawLine3D(castPos.x, castPos.y, castPos.z, target.x, target.y, target.z, 15, ARGB(255, 34, 139, 34))			
+						end
+						if info.hitchance ~= 0 then
+							CastSpell(_Q, castPos.x, castPos.z)
+						end
 					end
 				else
 					CastSpell(_Q, target.x, target.z)
@@ -416,7 +483,7 @@ function Menu()
 				Menu.Combo.R:addParam("minEnemy", "Min # of enemies for ultimate", SCRIPT_PARAM_SLICE, 1, 1, 5)			-- Min enemies value
 			Menu.Combo:addParam("useE", "Use E in combo mode", SCRIPT_PARAM_ONOFF, true)								-- Use E true/false
 			Menu.Combo:addParam("useItems", "Use items in combo mode", SCRIPT_PARAM_ONOFF, true)						-- Use items true/false				
-			Menu.Combo:addParam("useIgnite", "Ignite mode", SCRIPT_PARAM_LIST, 1, {"Disable", "On combo", "Secure kill"}) -- Use ignite dropdown
+			Menu.Combo:addParam("useIgnite", "Ignite mode", SCRIPT_PARAM_LIST, 1, {"Disable", "On combo", "Secure kill"}) -- Use ignite dropdown			
 			Menu.Combo:addParam("comboKey", "Combo mode", SCRIPT_PARAM_ONKEYDOWN, true, 32)								-- Carry me! true/false
 		--}
 
@@ -449,6 +516,7 @@ function Menu()
 			Menu.Draw:addParam("drawQ", "Draw Q range", SCRIPT_PARAM_ONOFF, true)										-- Draw Q true/false
 			Menu.Draw:addParam("drawE", "Draw E range", SCRIPT_PARAM_ONOFF, true)										-- Draw E true/false		
 			Menu.Draw:addParam("drawR", "Draw R range", SCRIPT_PARAM_ONOFF, true)										-- Draw R true/false
+			Menu.Draw:addParam("predLoc", "Draw predicted location", SCRIPT_PARAM_ONOFF, true)						-- Draw pred loc true/false	
 			--}
 
 		--{ Misc settings	
