@@ -1,9 +1,9 @@
 --[[
 	Top Lane Series - Aatrox by lel itz ok
-	version 0.004
+	version 0.005
 	20/06/2014
 --]]
-local version = 0.004
+local version = 0.005
 
 local author = "lel itz ok"
 
@@ -339,15 +339,30 @@ function SpellManager(target, Qs, Ws, Es, Rs, items, uIgnite, escape)
 	end
 
 	if Es then
-		if target and eReady then
-			if ValidTarget(target) then
-				if VIP_USER then
-					local castPos, info = Prodiction.GetConeAOEPrediction(target, Aatrox.E["range"], Aatrox.E["speed"], Aatrox.E["delay"], Aatrox.E["width"])
-					if castPos and info.hitchance ~= 0 then
-						CastSpell(_E, castPos.x, castPos.z)
+		if Menu.Combo.comboMode then
+			if target and eReady and (not qReady or GetDistance(target) < 600) then
+				if ValidTarget(target) then
+					if VIP_USER then
+						local castPos, info = Prodiction.GetConeAOEPrediction(target, Aatrox.E["range"], Aatrox.E["speed"], Aatrox.E["delay"], Aatrox.E["width"])
+						if castPos and info.hitchance ~= 0 then
+							CastSpell(_E, castPos.x, castPos.z)
+						end
+					else
+						CastSpell(_E, target.x, target.z)
 					end
-				else
-					CastSpell(_E, target.x, target.z)
+				end
+			end
+		else
+			if target and eReady then
+				if ValidTarget(target) then
+					if VIP_USER then
+						local castPos, info = Prodiction.GetConeAOEPrediction(target, Aatrox.E["range"], Aatrox.E["speed"], Aatrox.E["delay"], Aatrox.E["width"])
+						if castPos and info.hitchance ~= 0 then
+							CastSpell(_E, castPos.x, castPos.z)
+						end
+					else
+						CastSpell(_E, target.x, target.z)
+					end
 				end
 			end
 		end
@@ -469,6 +484,7 @@ function Menu()
 
 		--{ Combo settings
 		Menu:addSubMenu("[Settings] Combo mode", "Combo")
+			Menu.Combo:addParam("comboMode", "Force Q>E", SCRIPT_PARAM_ONKEYTOGGLE, false, string.byte("A"))				-- Force Q>E true/false	
 			Menu.Combo:addParam("useQ", "Use Q in combo mode", SCRIPT_PARAM_ONOFF, true)								-- Use Q true/false
 			Menu.Combo:addSubMenu("[Settings] W logic]", "W")
 				Menu.Combo.W:addParam("useW", "Use W in combo mode", SCRIPT_PARAM_ONOFF, true)							-- Use W true/false
@@ -479,7 +495,7 @@ function Menu()
 				Menu.Combo.R:addParam("minEnemy", "Min # of enemies for ultimate", SCRIPT_PARAM_SLICE, 1, 1, 5)			-- Min enemies value
 			Menu.Combo:addParam("useE", "Use E in combo mode", SCRIPT_PARAM_ONOFF, true)								-- Use E true/false
 			Menu.Combo:addParam("useItems", "Use items in combo mode", SCRIPT_PARAM_ONOFF, true)						-- Use items true/false				
-			Menu.Combo:addParam("useIgnite", "Ignite mode", SCRIPT_PARAM_LIST, 1, {"Disable", "On combo", "Secure kill"}) -- Use ignite dropdown			
+			Menu.Combo:addParam("useIgnite", "Ignite mode", SCRIPT_PARAM_LIST, 1, {"Disable", "On combo", "Secure kill"}) -- Use ignite dropdown
 			Menu.Combo:addParam("comboKey", "Combo mode", SCRIPT_PARAM_ONKEYDOWN, true, 32)								-- Carry me! true/false
 		--}
 
@@ -520,7 +536,7 @@ function Menu()
 			Menu.Misc:addParam("autoLevel", "Auto Level", SCRIPT_PARAM_LIST, 1, {"Disable", "R>E>W>Q"})
 			Menu.Misc:addParam("usePots", "Use HP pots", SCRIPT_PARAM_ONOFF, true)										-- Use HP pots true/false
 			Menu.Misc:addParam("HPHealth", "Min % for Health Pots", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)					-- Min % for health pots
-			Menu.Misc:addParam("smartW", "Allow script to control W", SCRIPT_PARAM_ONOFF, true)							-- Allow script to control W true/false
+			Menu.Misc:addParam("smartW", "Allow script to control W", SCRIPT_PARAM_ONKEYTOGGLE, true, string.byte("Z"))		-- Allow script to control W true/false
 			Menu.Misc:addParam("escapeKey", "Escape Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("T"))				-- Escape! true/false
 		--}
 
@@ -532,5 +548,6 @@ function Menu()
 		Menu.Harass:permaShow("harassKey2")
 		Menu.Combo:permaShow("comboKey")
 		Menu.Combo.R:permaShow("minEnemy")
+		Menu.Misc:permaShow("smartW")
 		--}
 end
