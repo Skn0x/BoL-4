@@ -211,6 +211,7 @@ function Pulse()
 	-- Update the target selector and assign our target to the target variable
 	ts:update()
 	target = ts.target
+	OW:ForceTarget(target)
 
 	HPManager()	
 
