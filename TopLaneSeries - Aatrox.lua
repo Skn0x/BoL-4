@@ -1,9 +1,9 @@
 --[[
 	Top Lane Series - Aatrox by lel itz ok
-	version 0.005
+	version 0.006
 	20/06/2014
 --]]
-local version = 0.005
+local version = 0.006
 
 local author = "lel itz ok"
 
@@ -134,10 +134,12 @@ function DrawLastHit()
 end
 
 function DrawPredPos()
-	local castPos, info = Prodiction.GetConeAOEPrediction(target, Aatrox.E["range"], Aatrox.E["speed"], Aatrox.E["delay"], Aatrox.E["width"])																
-	if Menu.Draw.predLoc and castPos ~= nil and target ~= nil then
-		DrawCircle(castPos.x, castPos.y, castPos.z, 150, ARGB(255, 34, 139, 34))
-		DrawLine3D(castPos.x, castPos.y, castPos.z, target.x, target.y, target.z, 5, ARGB(255, 34, 139, 34))			
+	if VIP_USER then
+		local castPos, info = Prodiction.GetConeAOEPrediction(target, Aatrox.E["range"], Aatrox.E["speed"], Aatrox.E["delay"], Aatrox.E["width"])																
+		if Menu.Draw.predLoc and castPos ~= nil and target ~= nil then
+			DrawCircle(castPos.x, castPos.y, castPos.z, 150, ARGB(255, 34, 139, 34))
+			DrawLine3D(castPos.x, castPos.y, castPos.z, target.x, target.y, target.z, 5, ARGB(255, 34, 139, 34))			
+		end
 	end
 end
 
@@ -528,7 +530,7 @@ function Menu()
 			Menu.Draw:addParam("drawQ", "Draw Q range", SCRIPT_PARAM_ONOFF, true)										-- Draw Q true/false
 			Menu.Draw:addParam("drawE", "Draw E range", SCRIPT_PARAM_ONOFF, true)										-- Draw E true/false		
 			Menu.Draw:addParam("drawR", "Draw R range", SCRIPT_PARAM_ONOFF, true)										-- Draw R true/false
-			Menu.Draw:addParam("predLoc", "Draw predicted location", SCRIPT_PARAM_ONOFF, true)						-- Draw pred loc true/false	
+			Menu.Draw:addParam("predLoc", "Draw predicted location (VIP)", SCRIPT_PARAM_ONOFF, true)					-- Draw pred loc true/false	
 			--}
 
 		--{ Misc settings	
